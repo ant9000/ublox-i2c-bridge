@@ -1,0 +1,17 @@
+[Unit]
+Description=UBlox I2C to serial bridge for GPSd
+Before=gpsd.service
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=1
+Environment=I2C_DEV=/dev/i2c-0
+Environment=I2C_ADDR=0x42
+Environment=TTY_DEV=/dev/gpsd0
+WorkingDirectory=/opt/ublox-i2c-bridge/
+ExecStart=/usr/bin/socat pty,rawer,link=${TTY_DEV} EXEC:"./ublox-i2c-bridge ${I2C_DEV} ${I2C_ADDR}",pty,rawer
+
+[Install]
+RequiredBy=gpsd.service
+WantedBy=multi-user.target
