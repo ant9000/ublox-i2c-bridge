@@ -16,7 +16,7 @@ This utility includes a systemd service file to automatically run at boot-up, wh
 
 ### Requirements
 
-You'll need a compile and socat to make this utility work:
+You'll need a compiler and socat to make this utility work:
 
 1. [socat](http://www.dest-unreach.org/socat/)
 

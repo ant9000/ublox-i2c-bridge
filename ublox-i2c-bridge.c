@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     uint8_t reg;
     size_t length, packet_length;
     input_state_t state;
-    uint8_t input[65535], *b; // UBX in theory allows for up to 65536 bytes
+    uint8_t input[6+65535+2], *b; // UBX allows for up to 65535 bytes of payload, plus 6 of header and 2 of checksum
     uint8_t buffer[255];
 
     if (argc < 3) {
