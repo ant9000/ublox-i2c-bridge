@@ -11,7 +11,10 @@ typedef enum {
     UBX_PREAMBLE,
     UBX_HEADER,
     UBX_PAYLOAD,
-    NMEA_PAYLOAD
+    NMEA_PAYLOAD,
+    RTCM_PREAMBLE,
+    RTCM_HEADER,
+    RTCM_PAYLOAD,
 } input_state_t;
 
 int main(int argc, char **argv) {
@@ -76,6 +79,8 @@ int main(int argc, char **argv) {
                         state = UBX_PREAMBLE;
                     } else if (*b == '$') {
                         state = NMEA_PAYLOAD;
+                    } else if (*b == 0xd3) {
+                        state = RTCM_PREAMBLE;
                     }
                     break;
                 case UBX_PREAMBLE:
@@ -100,6 +105,25 @@ int main(int argc, char **argv) {
                 case NMEA_PAYLOAD:
                     if (*b == '\n') {
                         packet_length = b - input + 1;
+                        write(fd, input, packet_length);
+                        state = START;
+                    }
+                    break;
+                case RTCM_PREAMBLE:
+                    if (*b & 0xfc == 0x00) {
+                        state = RTCM_HEADER;
+                    } else {
+                        state = START;
+                    }
+                    break;
+                case RTCM_HEADER:
+                    if (b - input + 1 == 3) {
+                        packet_length = 3 + (input[1] << 8) + input[2] + 3;
+                        state = RTCM_PAYLOAD;
+                    }
+                    break;
+                case RTCM_PAYLOAD:
+                    if (b - input + 1 == packet_length) {
                         write(fd, input, packet_length);
                         state = START;
                     }

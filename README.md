@@ -8,9 +8,7 @@ To enable read-only communication I've used the excellent [gpsd-i2c](https://git
 
 ### How this works
 
-This utility continuously reads a data stream from a particular I²C device and dumps it to `stdout`. On the other side of the communication, it reads `stdin` for UBX or NMEA messages, and handles them over to the I²C device. I've chosen to ignore any data validation for the device-provided data: I expect the final consumer of the stream to be responsible for that. For writing to the module, though, do some minimal parsing is needed in order to write messages with a single I²C transmission.
-
-*NOTE:* RTCM messages are not supported at the moment.
+This utility continuously reads a data stream from a particular I²C device and dumps it to `stdout`. On the other side of the communication, it reads `stdin` for UBX, NMEA or RTCM messages, and handles them over to the I²C device. I've chosen to ignore any data validation for the device-provided data: I expect the final consumer of the stream to be responsible for that. For writing to the GPS module, though, some minimal parsing is needed in order to write messages with a single I²C transmission.
 
 Socat is responsible for creating the virtual serial port device attached to `stdin` and `stdout` of the C program. Any tool or program (such as GPSD) that can read from a serial device can then make use of this virtual serial device.
 
