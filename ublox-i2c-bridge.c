@@ -60,19 +60,12 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+    fcntl(fileno(stdin), F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
     b = input;
     state = START;
+    packet_length = 0;
     while (1) {
-        if (b - input + 1 == sizeof(input)) {
-            // packet would overflow - discard data
-            state = START;
-        }
-        if (state == START) {
-            b = input;
-            packet_length = 0;
-        }
-        if (read(0, b, 1) == 1) {
+        while (read(fileno(stdin), b, 1) == 1) {
             switch (state) {
                 case START:
                     if (*b == 0xb5) { // µ
@@ -132,6 +125,14 @@ int main(int argc, char **argv) {
                     break;
             }
             b++;
+            if (b - input + 1 == sizeof(input)) {
+                // packet would overflow - discard data
+                state = START;
+            }
+            if (state == START) {
+                b = input;
+                packet_length = 0;
+            }
         }
 
         length = read(fd, &buffer, sizeof(buffer));
